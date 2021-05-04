@@ -20,11 +20,19 @@ layout(location = 0) out vec4 color;
 
 in vec2 v_texCoord;
 
-
+uniform vec4 cube_color; // used to highlight the where the light is
 uniform sampler2D u_Texture;
 
 void main()
 {
-    vec4 texColor = texture(u_Texture, v_texCoord);
-    color = texColor;
+	if (cube_color.w == 1.0)
+	{
+		color = cube_color;
+	}
+	else
+	{
+		vec4 texColor = texture(u_Texture, v_texCoord);
+		color = texColor;
+	}
+    
 };

@@ -178,6 +178,9 @@ glm::mat4 model;
 glm::mat4 view;
 glm::mat4 projection;
 
+// cube color
+glm::vec4 light_cube_color;
+
 
 /*
 void textured_cube()
@@ -320,6 +323,7 @@ static void Draw(void)
 	
 	if (!phong_flag)
 	{
+		light_cube_color.w = 0.0;
 		cube_shader->Bind();
 		cube_shader->SetUniform1i("u_Texture", 0);
 		if (more_cubes)
@@ -358,13 +362,24 @@ static void Draw(void)
 				glm::mat4 mvp = cam->projection_mat * cam->view_mat * t_model;
 				phong_shader->SetUniformMat4f("u_MVP", mvp);
 				phong_shader->SetUniformMat4f("model", t_model);
-
 				renderer.Draw(*VAO, *IBO, *phong_shader);
 			}
 		}
 		phong_shader->SetUniformMat4f("u_MVP", MVP);
 		phong_shader->SetUniformMat4f("model", model);
 		renderer.Draw(*VAO, *IBO, *phong_shader);
+
+		// draw the light
+		
+		light_cube_color.w = 1.0;
+		glm::mat4 t_model = glm::mat4(1.0f);
+		t_model = glm::translate(t_model,lightPos);
+		glm::mat4 mvp = cam->projection_mat * cam->view_mat * t_model;
+
+		cube_shader->Bind();
+		cube_shader->SetUniformVec4f("cube_color", light_cube_color);
+		cube_shader->SetUniformMat4f("u_MVP", mvp);
+		renderer.Draw(*VAO, *IBO, *cube_shader);
 	}
 	
 
@@ -500,6 +515,7 @@ void KeyboardSpecial(int key, int x, int y)
 // Initalisation
 void Init(void)
 {
+	
 	glewExperimental = true;
 	GLenum err = glewInit();
 
@@ -512,6 +528,8 @@ void Init(void)
 	rotation_flag = false;
 	more_cubes = false;
 	phong_flag = false;
+
+	light_cube_color = glm::vec4(1.0, 1.0, 1.0, 0.0);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
@@ -536,6 +554,7 @@ void Init(void)
 	image->Bind();
 	cube_shader->SetUniform1i("u_Texture", 0);
 	cube_shader->SetUniformMat4f("u_MVP", MVP);
+	cube_shader->SetUniformVec4f("cube_color", light_cube_color);
 	//TextureID = glGetUniformLocation(programID, "myTextureSampler");
 
 	//glEnable(GL_CULL_FACE);
