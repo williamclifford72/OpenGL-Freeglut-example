@@ -58,15 +58,16 @@ bool more_cubes;
 bool phong_flag; 
 
 
-/*
-previously had to keep track of rendering id's
-these are now kept in the separate object instances
-*/
 
 
 glm::mat4 MVP;
 
 
+
+/*
+previously had to keep track of rendering id's
+these are now kept in the separate object instances
+*/
 std::unique_ptr<VertexBuffer> VBO;
 std::unique_ptr<IndexBuffer> IBO;
 std::unique_ptr<VertexArray> VAO; 
@@ -78,6 +79,14 @@ Renderer renderer;
 
 glm::vec3 lightPos; 
 
+
+// Camera
+glm::mat4 model;
+glm::mat4 view;
+glm::mat4 projection;
+
+// cube color
+glm::vec4 light_cube_color;
 
 
 // Function prototypes (allows functions to be placed in any order within program)
@@ -103,6 +112,11 @@ void Init(void);
 								{-1.0,	1.0,	1.0}
 };*/
 
+// Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
+// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices each with x,y,z 12*3*3=108
+//GLfloat g_vertex_buffer_data[108] = { 0 };
+// Two UV coordinatesfor each vertex. They were created with Blender.
+//GLfloat g_uv_buffer_data[72] = { 0 };
 
 void loadCube()
 {
@@ -166,20 +180,9 @@ void loadCube()
 	IBO = std::make_unique<IndexBuffer>(indices, 36);
 }
 
-// Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
-// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices each with x,y,z 12*3*3=108
-//GLfloat g_vertex_buffer_data[108] = { 0 };
-// Two UV coordinatesfor each vertex. They were created with Blender.
-//GLfloat g_uv_buffer_data[72] = { 0 };
 
 
-// Camera
-glm::mat4 model;
-glm::mat4 view;
-glm::mat4 projection;
 
-// cube color
-glm::vec4 light_cube_color;
 
 
 /*
@@ -522,14 +525,16 @@ void Init(void)
 	std::string cam_type("proj");
 	cam = std::make_unique<Camera>(cam_type);
 
-	lightPos = glm::vec3(5.0f, 5.0f, 5.0f);
+	
 
 	// Set object rotation static (keys R=On, r=Off)
 	rotation_flag = false;
 	more_cubes = false;
 	phong_flag = false;
 
+	// light parameters for rendering
 	light_cube_color = glm::vec4(1.0, 1.0, 1.0, 0.0);
+	lightPos = glm::vec3(5.0f, 5.0f, 5.0f);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
